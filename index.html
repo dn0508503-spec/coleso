@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Колесо фортуны</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:white;
+  text-align:center;
+}
+
+/* центрирование */
+.container{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:15px;
+}
+
+/* колесо адаптивное */
+.wrap{
+  position:relative;
+  width:min(90vw, 340px);
+  height:min(90vw, 340px);
+  margin-top:10px;
+}
+
+/* стрелка */
+.pointer{
+  width:0;
+  height:0;
+  border-left:12px solid transparent;
+  border-right:12px solid transparent;
+  border-bottom:22px solid gold;
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+}
+
+/* колесо */
+.wheel{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:5px solid white;
+  position:relative;
+  overflow:hidden;
+  transition:transform 3s ease-out;
+}
+
+/* сектор */
+.segment{
+  position:absolute;
+  width:50%;
+  height:50%;
+  transform-origin:100% 100%;
+}
+
+.text{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:bold;
+  color:white;
+  pointer-events:none;
+  text-align:center;
+}
+
+/* input */
+input{
+  padding:12px;
+  width:85%;
+  max-width:260px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+
+/* кнопки */
+button{
+  padding:12px 16px;
+  margin:6px;
+  border-radius:10px;
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.add{background:limegreen;}
+.remove{background:red;}
+.spin{background:gold;}
+
+/* результат */
+.result{
+  margin-top:15px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>🎡 Колесо фортуны</h2>
+
+<div class="container">
+
+  <div class="wrap">
+    <div class="pointer"></div>
+    <div class="wheel" id="wheel"></div>
+  </div>
+
+  <input id="text" placeholder="Напиши слово">
+
+  <div>
+    <button class="add" onclick="addItem()">Добавить</button>
+    <button class="remove" onclick="removeItem()">Удалить</button>
+  </div>
+
+  <button class="spin" onclick="spin()">Крутить</button>
+
+  <div class="result" id="result"></div>
+
+</div>
+
+<script>
+
+let items = ["привет", "танцуй", "пой", "прыгни", "молчи", "стой"];
+let wheel = document.getElementById("wheel");
+let rotation = 0;
+
+function draw(){
+  wheel.innerHTML="";
+  let angle = 360/items.length;
+
+  items.forEach((t,i)=>{
+    let seg = document.createElement("div");
+    seg.className="segment";
+
+    seg.style.transform = `rotate(${i*angle}deg)`;
+    seg.style.background = i%2===0 ? "green" : "red";
+
+    let text = document.createElement("div");
+    text.className="text";
+    text.innerText = t;
+
+    seg.appendChild(text);
+    wheel.appendChild(seg);
+  });
+}
+
+draw();
+
+function addItem(){
+  let val = document.getElementById("text").value;
+  if(val.trim()){
+    items.push(val);
+    document.getElementById("text").value="";
+    draw();
+  }
+}
+
+function removeItem(){
+  items.pop();
+  draw();
+}
+
+function spin(){
+  let index = Math.floor(Math.random() * items.length);
+  let angle = 360 / items.length;
+
+  let randomOffset = (Math.random() * angle) - (angle / 2);
+  let stopAngle = 360 - (index * angle + angle / 2 + randomOffset);
+
+  rotation += 360 * 5 + stopAngle;
+
+  wheel.style.transform = `rotate(${rotation}deg)`;
+
+  setTimeout(()=>{
+    document.getElementById("result").innerText = "🎯 " + items[index];
+  }, 3000);
+}
+
+</script>
+
+</body>
+</html>
